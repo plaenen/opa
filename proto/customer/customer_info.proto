@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+package customer;
+
+option go_package = "/customer";
+
+message transaction {
+  int64  amount = 1;
+  string currency = 2;
+}
+
+message products {
+  string product_id = 1;
+  string product_type = 2;
+  // The product state "ACTIVATING, ACTIVE, SUSPENDED, ARCHIVED"
+  string state = 3;
+}
+
+message customer_info {
+  // The customer id
+  string customer_id = 1;
+  // Customer status
+  string customer_status = 2; 
+  // The prodcuts a customer has
+  repeated products products = 3;
+  // A list of total transactions for the current day per currency 
+  repeated transaction daily_transaction_summary = 4; 
+}
+
+

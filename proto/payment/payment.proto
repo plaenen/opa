@@ -1,0 +1,65 @@
+// Copyright 2021 Pascal Laenen
+
+// Defines the API for payments
+// style guide https://developers.google.com/protocol-buffers/docs/style
+
+syntax = "proto3";
+
+package payment;
+
+option go_package = "/payment";
+
+// ----------------- Payments Service -----------------
+
+service PaymentService {
+  rpc RequestPayment (RequestPaymentReq) returns (RequestPaymentRes) {}
+}
+
+service BankAccountService {
+  rpc GetBankAccounts (GetBankAccountsReq) returns (GetBankAccountsRes) {}
+  rpc GetBallance (GetBallanceReq) returns (GetBallanceRes) {}
+}
+
+message RequestPaymentReq {
+  string customer_id = 1;
+  string from_account_id = 2;
+  string to_benificiary_id = 3;
+  Amount amount = 4;
+}
+
+message Amount {
+  string value = 1;
+  string currency = 2;
+}
+
+message RequestPaymentRes {
+  string payment_request_id = 1;
+}
+
+message GetBankAccountsReq {
+  string customerId = 1;
+}
+
+message GetBankAccountsRes {
+  string customer_id = 1;
+  repeated BankAccount bank_account = 2;
+}
+
+message BankAccount {
+  string id = 1;
+  string sort_code = 2;
+  string account_code = 3;
+  string iban = 4;
+  repeated string currencies = 5;
+}
+
+message GetBallanceReq {
+  string customer_id = 1;
+  string bank_account_id = 2;
+}
+
+message GetBallanceRes {
+  string customer_id = 1;
+  string bank_account_id = 2;
+}
+

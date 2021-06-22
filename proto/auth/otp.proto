@@ -1,0 +1,67 @@
+// Copyright 2021 Pascal Laenen
+
+// Defines the API for sending and verifying OTP messages
+
+// style guide https://developers.google.com/protocol-buffers/docs/style
+
+syntax = "proto3";
+
+package auth;
+
+option go_package = "/auth";
+
+// ----------------- Otp Service -----------------
+
+service OtpService {
+  // Request a new OTP
+  // When both a email and mobile number is provided email wins
+  // and mobile will be ignored
+  rpc RequestOtp (RequestOtpReq) returns (RequestOtpRes) {}
+  // Verify a given OTP
+  rpc VerifyOp (VerifyOptReq) returns (VerifyOtpRes) {}
+}
+
+message RequestOtpReq{
+  string IdempotencyKey = 1;
+  // External refernece e.g. customerId, email, ...
+  string extenal_reference = 2;
+  // When an email is provided we will send an email otp
+  string email = 3;
+  // When an mobile number is providec we will send an sms otp
+  string mobile = 4;
+  // Defines how long the otp will be valid once send
+  // Default will be 5 min
+  string ttl_seconds = 5;
+  // Defines the backoff coefficient for requesting a new otp
+  // Default backoff coeficient = 2 and first time resend is set a 60 seconds
+  string backoff_coefficient = 6;
+  // Defines how often a user can retry to verify a given otp
+  // Default will be set to 3
+  int32 maxRetries = 7;
+}
+
+message RequestOtpRes{
+  // A nonce will be provided which has to be send back 
+  // when verifying the by SMS or Mobile phone provided otp
+  string nonce = 1;  
+  // Retry will be possible adter the given time
+  // first time 60 seconds then multiplied by the backoff_coefficient
+  int32 retry_delay_seconds = 2;
+}
+
+message VerifyOptReq{
+  string IdempotencyKey = 1; 
+  // External refernece e.g. customerId, email, ...
+  // Has to be the same as used when requesting an otp
+  string extenal_reference = 2;
+  // The provided nonce when requesting an otp
+  string nonce = 3;
+  // The opt which was send by email or sms
+  string otp = 4;
+}
+
+message VerifyOtpRes{
+  // Indicates if the 
+  bool verified = 1;
+  int32 retriesLeft = 2;
+}
